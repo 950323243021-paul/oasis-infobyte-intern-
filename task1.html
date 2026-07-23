@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian Film Lab — Mail-in Film Developing &amp; Scanning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+
+  /* ============ TOKENS ============ */
+  :root{
+    --bg:        #171412;   /* walnut-black, base background */
+    --surface:   #211D19;   /* card / raised surface */
+    --surface-2: #2A241F;   /* slightly lighter surface for hover states */
+    --paper:     #EDE6D6;   /* cream paper, primary text on dark */
+    --paper-dim: #C9C0AE;   /* dimmer paper for secondary text */
+    --safelight: #B23A2E;   /* muted darkroom safelight red — the accent */
+    --safelight-bright: #D14A3B;
+    --amber:     #D9A441;   /* film-box gold, used sparingly for highlights */
+    --line:      #4A423A;   /* warm hairline / sprocket color */
+    --line-soft: #332C26;
+
+    --display: 'Bebas Neue', 'Arial Narrow', sans-serif;
+    --body:    'Source Serif 4', Georgia, serif;
+    --mono:    'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--bg);
+    color:var(--paper);
+    font-family:var(--body);
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  img{ max-width:100%; display:block; }
+  a{ color:inherit; text-decoration:none; }
+  ul{ list-style:none; }
+  section{ padding:96px 24px; }
+  .wrap{ max-width:1120px; margin:0 auto; }
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--amber);
+    outline-offset:3px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+
+  /* ============ SPROCKET STRIP (signature motif) ============ */
+  .sprockets{
+    display:flex;
+    justify-content:space-evenly;
+    align-items:center;
+    height:14px;
+    background:var(--line-soft);
+  }
+  .sprockets span{
+    width:8px; height:8px;
+    background:var(--bg);
+    border-radius:2px;
+  }
+
+  /* ============ NAV ============ */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(23,20,18,0.94);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .nav-inner{
+    max-width:1120px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px;
+  }
+  .logo{
+    font-family:var(--display);
+    font-size:26px;
+    letter-spacing:2px;
+    color:var(--paper);
+    display:flex; align-items:center; gap:10px;
+  }
+  .logo .dot{
+    width:10px; height:10px; border-radius:50%;
+    background:var(--safelight);
+    box-shadow:0 0 8px 2px rgba(178,58,46,0.65);
+  }
+  nav ul{ display:flex; gap:36px; }
+  nav a{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:0.06em;
+    color:var(--paper-dim);
+    text-transform:uppercase;
+    transition:color .2s ease;
+    padding:4px 0;
+    border-bottom:1px solid transparent;
+  }
+  nav a:hover{ color:var(--amber); border-color:var(--amber); }
+
+  .nav-cta{
+    font-family:var(--mono);
+    font-size:12.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    background:var(--safelight);
+    color:var(--paper);
+    padding:10px 18px;
+    border-radius:2px;
+    border:1px solid var(--safelight-bright);
+    transition:background .2s ease, transform .15s ease;
+  }
+  .nav-cta:hover{ background:var(--safelight-bright); transform:translateY(-1px); }
+
+  .nav-toggle{ display:none; }
+
+  /* ============ HERO ============ */
+  .hero{
+    padding-top:72px;
+    padding-bottom:72px;
+    background:
+      radial-gradient(ellipse at 15% 20%, rgba(178,58,46,0.10), transparent 55%),
+      var(--bg);
+  }
+  .hero .wrap{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:64px;
+    align-items:center;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin-bottom:18px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px; height:1px;
+    background:var(--amber);
+    display:inline-block;
+  }
+  h1{
+    font-family:var(--display);
+    font-size:clamp(42px, 5.6vw, 74px);
+    line-height:0.98;
+    letter-spacing:0.5px;
+    color:var(--paper);
+    margin-bottom:22px;
+  }
+  h1 em{
+    font-style:normal;
+    color:var(--safelight-bright);
+  }
+  .hero p.sub{
+    font-size:19px;
+    color:var(--paper-dim);
+    max-width:46ch;
+    margin-bottom:34px;
+  }
+  .cta-row{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+  .btn-primary{
+    font-family:var(--mono);
+    font-size:14px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    background:var(--safelight);
+    color:var(--paper);
+    padding:16px 28px;
+    border-radius:2px;
+    border:1px solid var(--safelight-bright);
+    transition:background .2s ease, transform .15s ease, box-shadow .2s ease;
+  }
+  .btn-primary:hover{
+    background:var(--safelight-bright);
+    transform:translateY(-2px);
+    box-shadow:0 8px 22px -8px rgba(178,58,46,0.6);
+  }
+  .btn-ghost{
+    font-family:var(--mono);
+    font-size:14px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--paper-dim);
+    padding:16px 8px;
+    border-bottom:1px solid var(--line);
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .btn-ghost:hover{ color:var(--paper); border-color:var(--paper-dim); }
+
+  /* --- contact sheet visual --- */
+  .contact-sheet{
+    background:var(--surface);
+    border:1px solid var(--line-soft);
+    border-radius:4px;
+    padding:14px;
+  }
+  .cs-strip{
+    background:var(--line-soft);
+  }
+  .cs-frames{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+    padding:14px 0;
+  }
+  .frame{
+    position:relative;
+    aspect-ratio:3/2;
+    background:
+      linear-gradient(135deg, #33291f, #1c1613 70%);
+    border-radius:2px;
+    overflow:hidden;
+    border:1px solid var(--line-soft);
+    transition:transform .25s ease, border-color .25s ease;
+  }
+  .frame:hover{ transform:translateY(-3px) rotate(-0.5deg); border-color:var(--amber); }
+  .frame::after{
+    content:attr(data-n);
+    position:absolute; bottom:4px; right:6px;
+    font-family:var(--mono);
+    font-size:10px;
+    color:var(--amber);
+    letter-spacing:0.05em;
+  }
+  .frame.lit{
+    background:
+      radial-gradient(circle at 60% 35%, rgba(217,164,65,0.35), transparent 60%),
+      linear-gradient(135deg, #3a2c22, #1c1613 75%);
+  }
+  .frame.tone-red{
+    background:
+      radial-gradient(circle at 40% 60%, rgba(178,58,46,0.4), transparent 60%),
+      linear-gradient(135deg, #33241f, #1c1613 75%);
+  }
+  .cs-caption{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--paper-dim);
+    text-align:center;
+    letter-spacing:0.04em;
+    padding-top:6px;
+  }
+
+  /* ============ SECTION HEADERS ============ */
+  .section-head{
+    max-width:640px;
+    margin-bottom:56px;
+  }
+  .section-head .eyebrow{ color:var(--safelight-bright); }
+  .section-head .eyebrow::before{ background:var(--safelight-bright); }
+  .section-head h2{
+    font-family:var(--display);
+    font-size:clamp(32px, 4vw, 46px);
+    letter-spacing:0.4px;
+    color:var(--paper);
+    margin-bottom:14px;
+  }
+  .section-head p{
+    color:var(--paper-dim);
+    font-size:17px;
+  }
+
+  /* ============ HOW IT WORKS ============ */
+  .process{ background:var(--surface); }
+  .steps{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:32px;
+  }
+  .step{
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:4px;
+    padding:32px 26px;
+    position:relative;
+  }
+  .step .frame-no{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--amber);
+    letter-spacing:0.08em;
+    margin-bottom:18px;
+    display:block;
+  }
+  .step h3{
+    font-family:var(--display);
+    font-size:24px;
+    letter-spacing:0.4px;
+    margin-bottom:12px;
+    color:var(--paper);
+  }
+  .step p{ color:var(--paper-dim); font-size:15.5px; }
+
+  /* ============ FEATURES ============ */
+  .features .wrap{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:56px;
+    align-items:start;
+  }
+  .feature-list{ display:flex; flex-direction:column; gap:28px; }
+  .feature-item{
+    display:flex; gap:18px;
+    border-top:1px solid var(--line-soft);
+    padding-top:22px;
+  }
+  .feature-item:first-child{ border-top:none; padding-top:0; }
+  .feature-tag{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--amber);
+    letter-spacing:0.05em;
+    white-space:nowrap;
+    padding-top:3px;
+  }
+  .feature-item h4{
+    font-family:var(--body);
+    font-weight:600;
+    font-size:18px;
+    color:var(--paper);
+    margin-bottom:6px;
+  }
+  .feature-item p{ color:var(--paper-dim); font-size:15.5px; }
+
+  .spec-card{
+    background:var(--surface);
+    border:1px solid var(--line-soft);
+    border-radius:4px;
+    padding:0;
+    overflow:hidden;
+  }
+  .spec-card .sprockets{ }
+  .spec-row{
+    display:flex; justify-content:space-between;
+    padding:16px 24px;
+    border-bottom:1px solid var(--line-soft);
+    font-family:var(--mono);
+    font-size:13.5px;
+  }
+  .spec-row:last-child{ border-bottom:none; }
+  .spec-row span:first-child{ color:var(--paper-dim); }
+  .spec-row span:last-child{ color:var(--paper); }
+  .spec-card-head{
+    padding:22px 24px 6px;
+    font-family:var(--display);
+    font-size:20px;
+    letter-spacing:0.4px;
+    color:var(--paper);
+  }
+
+  /* ============ TESTIMONIALS ============ */
+  .testimonials{ background:var(--surface); }
+  .quote-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:28px;
+  }
+  .quote-card{
+    background:var(--bg);
+    border:1px solid var(--line-soft);
+    border-radius:4px;
+    padding:28px 24px;
+    display:flex; flex-direction:column; justify-content:space-between;
+    min-height:220px;
+  }
+  .quote-card p.quote{
+    font-size:16.5px;
+    color:var(--paper);
+    margin-bottom:20px;
+  }
+  .quote-meta{
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--paper-dim);
+    letter-spacing:0.03em;
+    border-top:1px solid var(--line-soft);
+    padding-top:14px;
+  }
+  .quote-meta b{ color:var(--amber); font-weight:500; }
+
+  /* ============ CLOSING CTA ============ */
+  .closing{
+    text-align:center;
+  }
+  .closing h2{
+    font-family:var(--display);
+    font-size:clamp(34px, 5vw, 56px);
+    letter-spacing:0.5px;
+    margin-bottom:18px;
+  }
+  .closing p{
+    color:var(--paper-dim);
+    max-width:50ch;
+    margin:0 auto 34px;
+  }
+  .closing .cta-row{ justify-content:center; }
+
+  /* ============ FOOTER ============ */
+  footer{
+    background:var(--surface);
+    border-top:1px solid var(--line-soft);
+  }
+  .footer-inner{
+    max-width:1120px; margin:0 auto;
+    padding:56px 24px 32px;
+    display:grid;
+    grid-template-columns:1.4fr 1fr 1fr 1fr;
+    gap:40px;
+  }
+  .footer-brand .logo{ margin-bottom:14px; }
+  .footer-brand p{ color:var(--paper-dim); font-size:14.5px; max-width:32ch; }
+  footer h5{
+    font-family:var(--mono);
+    font-size:12.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin-bottom:16px;
+  }
+  footer ul{ display:flex; flex-direction:column; gap:10px; }
+  footer ul a{
+    color:var(--paper-dim);
+    font-size:14.5px;
+    transition:color .2s ease;
+  }
+  footer ul a:hover{ color:var(--paper); }
+  .footer-bottom{
+    border-top:1px solid var(--line-soft);
+    max-width:1120px; margin:0 auto;
+    padding:22px 24px 28px;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:12px;
+  }
+  .footer-bottom p{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--paper-dim);
+    letter-spacing:0.03em;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:900px){
+    .hero .wrap{ grid-template-columns:1fr; gap:48px; }
+    .features .wrap{ grid-template-columns:1fr; gap:40px; }
+    .steps{ grid-template-columns:1fr; }
+    .quote-grid{ grid-template-columns:1fr; }
+    .footer-inner{ grid-template-columns:1fr 1fr; }
+  }
+
+  @media (max-width:640px){
+    section{ padding:64px 20px; }
+    .nav-inner{ padding:14px 20px; }
+    nav ul{
+      position:fixed; top:64px; left:0; right:0;
+      background:var(--bg);
+      flex-direction:column;
+      gap:0;
+      border-bottom:1px solid var(--line-soft);
+      transform:translateY(-8px);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .2s ease, transform .2s ease;
+    }
+    nav ul li{ width:100%; }
+    nav ul a{
+      display:block;
+      padding:16px 24px;
+      border-bottom:1px solid var(--line-soft);
+    }
+    .nav-toggle{
+      display:inline-flex;
+      align-items:center; justify-content:center;
+      width:36px; height:36px;
+      background:transparent;
+      border:1px solid var(--line-soft);
+      border-radius:3px;
+      color:var(--paper);
+      font-family:var(--mono);
+      font-size:16px;
+    }
+    .nav-toggle-check{ display:none; }
+    .nav-toggle-check:checked ~ nav ul{
+      opacity:1; pointer-events:auto; transform:translateY(0);
+    }
+    .nav-cta{ display:none; }
+    .cs-frames{ grid-template-columns:repeat(3, 1fr); }
+    .footer-inner{ grid-template-columns:1fr 1fr; }
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="sprockets" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="nav-inner">
+    <a href="#top" class="logo"><span class="dot" aria-hidden="true"></span>MERIDIAN</a>
+    <input type="checkbox" id="nav-toggle-check" class="nav-toggle-check">
+    <nav>
+      <ul>
+        <li><a href="#process">How it works</a></li>
+        <li><a href="#features">What you get</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <label for="nav-toggle-check" class="nav-toggle" aria-label="Toggle navigation">☰</label>
+    <a href="#contact" class="nav-cta">Ship a roll</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Mail-in film developing &amp; scanning</p>
+        <h1>Send your rolls.<br>Get your <em>negatives</em> back.</h1>
+        <p class="sub">Meridian develops 35mm and 120 film by hand in small batches, scans every frame on a proper flatbed, and mails your negatives back safe in archival sleeves. No app, no upload queue — just a padded envelope and a person who checks your exposure before it goes in the tank.</p>
+        <div class="cta-row">
+          <a href="#contact" class="btn-primary">Start your order</a>
+          <a href="#process" class="btn-ghost">See the process →</a>
+        </div>
+      </div>
+
+      <div class="contact-sheet" aria-hidden="true">
+        <div class="cs-strip sprockets">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="cs-frames">
+          <div class="frame" data-n="01"></div>
+          <div class="frame lit" data-n="02"></div>
+          <div class="frame" data-n="03"></div>
+          <div class="frame tone-red" data-n="04"></div>
+          <div class="frame" data-n="05"></div>
+          <div class="frame lit" data-n="06"></div>
+        </div>
+        <div class="cs-strip sprockets">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <p class="cs-caption">CONTACT SHEET — ROLL 0148 — KODAK PORTRA 400</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="process" id="process">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">The process</p>
+        <h2>Three steps, one roll at a time</h2>
+        <p>Every order moves through the darkroom in the same order — there's no shortcut that doesn't cost you a frame.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="frame-no">FRAME 01</span>
+          <h3>Mail it in</h3>
+          <p>Drop your exposed rolls in any padded mailer with your order slip. We text you the moment it lands on our bench.</p>
+        </div>
+        <div class="step">
+          <span class="frame-no">FRAME 02</span>
+          <h3>We develop it</h3>
+          <p>Hand-processed in small batches — C-41, E-6, or black &amp; white — with fresh chemistry checked every morning against a control strip.</p>
+        </div>
+        <div class="step">
+          <span class="frame-no">FRAME 03</span>
+          <h3>Scan &amp; return</h3>
+          <p>Every frame gets a flatbed scan at your chosen resolution. Negatives go back to you in archival sleeves, gallery-ready.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section class="features" id="features">
+    <div class="wrap">
+      <div>
+        <div class="section-head">
+          <p class="eyebrow">What you get</p>
+          <h2>Built for people who shoot, not just snap</h2>
+        </div>
+        <div class="feature-list">
+          <div class="feature-item">
+            <span class="feature-tag">SCAN</span>
+            <div>
+              <h4>3400dpi flatbed scans</h4>
+              <p>Every frame, not just the ones you flag — delivered as high-res TIFFs and web-ready JPEGs.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-tag">CHEM</span>
+            <div>
+              <h4>Fresh chemistry, every batch</h4>
+              <p>C-41, E-6, and B&amp;W lines are rotated on a fixed schedule and checked with a control strip daily.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-tag">NEGS</span>
+            <div>
+              <h4>Negatives always returned</h4>
+              <p>Cut, sleeved in archival PrintFile pages, and mailed back — your film never gets recycled or binned.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <span class="feature-tag">TIME</span>
+            <div>
+              <h4>48-hour turnaround</h4>
+              <p>From the bench to your inbox in two business days, with a rush option for the same-day queue.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec-card">
+        <div class="sprockets"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <p class="spec-card-head">Order sheet</p>
+        <div class="spec-row"><span>Format</span><span>35mm &amp; 120</span></div>
+        <div class="spec-row"><span>Process</span><span>C-41 / E-6 / B&amp;W</span></div>
+        <div class="spec-row"><span>Scan res.</span><span>up to 3400dpi</span></div>
+        <div class="spec-row"><span>Delivery</span><span>Digital + negatives</span></div>
+        <div class="spec-row"><span>Turnaround</span><span>48 hours</span></div>
+        <div class="spec-row"><span>From</span><span>$14 / roll</span></div>
+        <div class="sprockets"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="testimonials" id="reviews">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">From the mailbag</p>
+        <h2>What shooters are saying</h2>
+      </div>
+      <div class="quote-grid">
+        <div class="quote-card">
+          <p class="quote">"My Portra came back with better color than the lab I used to walk into in person. And I didn't have to leave my apartment."</p>
+          <p class="quote-meta"><b>Dana R.</b> — wedding photographer</p>
+        </div>
+        <div class="quote-card">
+          <p class="quote">"I've sent them expired Tri-X, half-loaded rolls, everything. They always email before doing anything unusual to a roll."</p>
+          <p class="quote-meta"><b>Marcus O.</b> — street photography</p>
+        </div>
+        <div class="quote-card">
+          <p class="quote">"Getting the actual negatives back matters to me. Meridian is the only mail-in lab I found that treats that as standard, not an upsell."</p>
+          <p class="quote-meta"><b>Priya K.</b> — film student</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLOSING CTA ============ -->
+  <section class="closing">
+    <div class="wrap">
+      <h2>Your next roll is one envelope away</h2>
+      <p>Print a free order slip, drop your film in the mail, and we'll take it from there.</p>
+      <div class="cta-row">
+        <a href="#contact" class="btn-primary">Start your order</a>
+        <a href="#process" class="btn-ghost">Read the FAQ →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="#top" class="logo"><span class="dot" aria-hidden="true"></span>MERIDIAN</a>
+      <p>A small mail-in film lab. Hand-developed, flatbed-scanned, negatives always returned.</p>
+    </div>
+    <div>
+      <h5>Lab</h5>
+      <ul>
+        <li><a href="#process">How it works</a></li>
+        <li><a href="#features">Pricing</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <ul>
+        <li><a href="mailto:hello@meridianfilmlab.example">hello@meridianfilmlab.example</a></li>
+        <li><a href="tel:+10000000000">(000) 000-0000</a></li>
+        <li><a href="#top">123 Darkroom Ave, Unit 4</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Follow</h5>
+      <ul>
+        <li><a href="#top">Instagram</a></li>
+        <li><a href="#top">Flickr</a></li>
+        <li><a href="#top">Newsletter</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="sprockets"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="footer-bottom">
+    <p>© 2026 MERIDIAN FILM LAB — DEVELOPED WITH CARE</p>
+    <p>ROLL 0148 / FRAME 36A</p>
+  </div>
+</footer>
+
+</body>
+</html>
